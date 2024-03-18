@@ -13,6 +13,7 @@
         "laravel/framework": "^9.19",
         "laravel/sanctum": "^3.0",
         "laravel/tinker": "^2.7",
+        "mll-lab/laravel-graphiql": "^3.2",
         "mongodb/laravel-mongodb": "3.9.5",
         "nuwave/lighthouse": "^6.35"
     },

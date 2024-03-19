@@ -4,9 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use App\Models\User;
+use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Support\Facades\Gate;
+
 
 class AuthServiceProvider extends ServiceProvider
 {
+    use HandlesAuthorization;
     /**
      * The policy mappings for the application.
      *
@@ -27,6 +32,10 @@ class AuthServiceProvider extends ServiceProvider
             return config('app.frontend_url')."/password-reset/$token?email={$notifiable->getEmailForPasswordReset()}";
         });
 
-        //
+        Gate::define('access-products', function (User $user) {
+            // Check if user has permission to access products
+            return $user->hasPermission('access-products');
+        });
+
     }
 }

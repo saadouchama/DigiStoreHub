@@ -15,6 +15,13 @@ return new class extends Migration
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
+            $table->string('name');
+            $table->text('description');
+            $table->float('price');
+            $table->string('category');
+            $table->json('tags');
+            // Assuming ratings and reviews will be stored in separate tables
+            // $table->foreignId('product_rating_id')->nullable()->constrained('product_ratings')->onDelete('cascade');
             $table->timestamps();
         });
     }

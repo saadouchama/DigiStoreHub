@@ -18,8 +18,8 @@ type Query {
       name: String @where(operator: "like")
     ): [User!]! @paginate(defaultCount: 10)
 
-    products: [Product!]!
-    product(id: ID!): Product!
+    products: [Product!]! @paginate(defaultCount: 10)
+    product(id: ID! @eq): Product! @find
 
 }
 
@@ -81,17 +81,15 @@ type OrderProduct {
     quantity: Int!
 }
 type Mutation {
-    createProduct(input: CreateProductInput!): Product!
-    createReview(input: CreateReviewInput!): Review!
-    # Other mutations
+  createProduct(input: CreateProductInput!): Product! @create
 }
 
 input CreateProductInput {
-    name: String!
-    description: String!
-    price: Float!
-    category: String!
-    tags: [String!]!
+  name: String!
+  description: String!
+  price: Float!
+  category: String!
+  tags: [String!]!
 }
 
 input CreateReviewInput {

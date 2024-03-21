@@ -20,20 +20,25 @@ class CreateProductMutation
     public function __invoke($_, array $args): Product
     {
         try {
-            MongoDB::transaction(function () {
+            return MongoDB::transaction(function () use ($args) {
                 $product = new Product([
                     'name' => $args['input']['name'],
                     'description' => $args['input']['description'],
                     'price' => $args['input']['price'],
                     'tags' => $args['input']['tags'],
-                    'catergory' => $args['input']['catergory'],
+                    'category' => $args['input']['category'],
                 ]);
 
-                    $product->save();
+                $product->save();
 
-                    return $product;
-                });
+                if (!$product->wasRecentlyCreated) {
+                    throw new \Exception("Failed to create the product.");
+                }
+
+                return $product;
+            });
         } catch (\Exception $e) {
+            $e->getMessage();
             // Handle transaction failure or exceptions
             // Rollback logic can also be included here
         }

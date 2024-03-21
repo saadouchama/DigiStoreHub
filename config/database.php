@@ -45,12 +45,13 @@ return [
 
         'mongodb' => [
             'driver'   => 'mongodb',
-            'host'     => env('DB_MONGO_HOST', 'localhost'),
+            'host'     => explode(',', env('DB_HOST')),
             'port'     => env('DB_MONGO_PORT', 27017),
             'database' => env('DB_MONGO_DATABASE'),
             'username' => env('DB_MONGO_USERNAME'),
             'password' => env('DB_MONGO_PASSWORD'),
             'options'  => [
+                'replicaSet' => 'myReplicaSet',
                 'database' => env('DB_MONGO_AUTH_DATABASE', 'admin'), // required with Mongo 3+
             ],
         ],

@@ -58,8 +58,12 @@ type Product {
     price: Float!
     category: String!
     tags: [String!]!
+    images: [String!]!
     ratings: ProductRating
     reviews: [Review!]
+}
+input UploadImageInput {
+  file: Upload!
 }
 type ProductRating {
     average: Float!
@@ -94,6 +98,8 @@ type Mutation {
     login(input: LoginInput!): AuthPayload
         @field(resolver: "App\\GraphQL\\Resolvers\\LoginResolver")
     logout: Boolean @field(resolver: "App\\GraphQL\\Resolvers\\LogoutResolver")
+    createProduct(input: CreateProductInput!): Product! @create
+    uploadImages(input: [UploadImageInput!]!): [String!]! @field(resolver: "App\\GraphQL\\Mutations\\UploadImagesMutation")
 }
 
 input LoginInput {
@@ -119,6 +125,7 @@ input CreateProductInput {
     price: Float!
     category: String!
     tags: [String!]!
+    images: [String!]!
 }
 
 input CreateReviewInput {

@@ -21,6 +21,8 @@ type Query {
         name: String @where(operator: "like")
     ): [User!]! @paginate(defaultCount: 10)
 
+    me: User @auth(guards: ["sanctum"])
+
     products: [Product!]!
         @field(resolver: "App\\GraphQL\\Resolvers\\ProductsResolver")
     product(id: ID! @eq): Product!
@@ -87,6 +89,28 @@ type OrderProduct {
 type Mutation {
     createProduct(input: CreateProductInput!): Product!
         @field(resolver: "App\\GraphQL\\Resolvers\\CreateProductResolver")
+    register(input: RegisterInput!): User
+        @field(resolver: "App\\GraphQL\\Resolvers\\RegisterResolver")
+    login(input: LoginInput!): AuthPayload
+        @field(resolver: "App\\GraphQL\\Resolvers\\LoginResolver")
+    logout: Boolean @field(resolver: "App\\GraphQL\\Resolvers\\LogoutResolver")
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+type AuthPayload {
+    accessToken: String
+    user: User
+}
+
+input RegisterInput {
+    name: String!
+    email: String!
+    password: String! @hash
+    password_confirmation: String! @hash
 }
 
 input CreateProductInput {

@@ -102,6 +102,8 @@ type Mutation {
     createProduct(input: CreateProductInput!): Product! @create
     uploadImages(files: [Upload!]!): [String!]!
         @field(resolver: "App\\GraphQL\\Mutations\\UploadImagesMutation")
+    createOrder(input: CreateOrderInput!): Order
+        @field(resolver: "App\\GraphQL\\Mutations\\CreateOrderResolver")
 }
 type Image {
     url: String!
@@ -138,4 +140,29 @@ input CreateReviewInput {
     userId: ID!
     text: String!
     rating: Float!
+}
+type Order {
+    id: ID!
+    user: User
+    status: String
+    total_price: Float
+    items: [OrderItem] @hasMany
+    created_at: DateTime
+    updated_at: DateTime
+}
+
+type OrderItem {
+    id: ID!
+    product: Product @belongsTo
+    quantity: Int
+    price: Float
+}
+input CreateOrderInput {
+    userId: ID!
+    items: [CreateOrderItemInput!]!
+}
+
+input CreateOrderItemInput {
+    productId: ID!
+    quantity: Int!
 }

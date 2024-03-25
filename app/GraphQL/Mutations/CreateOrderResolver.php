@@ -17,7 +17,7 @@ class CreateOrderResolver
         $order->user_id = $args['input']['userId'];
         $order->status = 'pending'; // default status
         $order->save();
-
+        $total_price = 0;
         // Add items to the order
         foreach ($args['input']['items'] as $itemInput) {
             $item = new OrderItem();
@@ -25,6 +25,8 @@ class CreateOrderResolver
             $item->product_id = $itemInput['productId'];
             $item->quantity = $itemInput['quantity'];
             // Optionally calculate price
+            $total_price += $item->quantity * $item->product->price;
+            $order->update(['total_price' => $total_price]);
             $item->save();
         }
 

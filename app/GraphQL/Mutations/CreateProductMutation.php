@@ -6,11 +6,10 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Product;
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Mutation;
-use Rebing\GraphQL\Support\Facades\GraphQL;
-use Jenssegers\Mongodb\Facades\MongoDB;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
-class CreateProductMutation extends Mutation
+class CreateProductMutation
 {
     protected $attributes = [
         'name' => 'createProduct',
@@ -33,23 +32,24 @@ class CreateProductMutation extends Mutation
 
     public function resolve($root, $args)
     {
-        // Start a MongoDB transaction
-        $session = Product::startSession();
-        $session->startTransaction();
+        // Validate the input
+        $validator = Validator::make($args, [
+            'name' => 'required|string',
+            'description' => 'required|string',
+            'price' => 'required|numeric',
+            'images' => 'required|array'
+        ]);
+
+        if ($validator->fails()) {
+            return $validator->errors()->first();
+        }
 
         try {
-            // Create a new product with images
             $product = Product::create($args);
-
-            // Commit the transaction
-            $session->commitTransaction();
-
-            // Return the product ID
             return $product->id;
         } catch (\Exception $e) {
-            // Rollback the transaction if an error occurs
-            $session->abortTransaction();
-            return $e->getMessage();
+            Log::error('Product creation failed: ' . $e->getMessage());
+            return 'Failed to create the product.';
         }
     }
 }

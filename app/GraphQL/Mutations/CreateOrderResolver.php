@@ -58,7 +58,7 @@ class CreateOrderResolver
         } catch (\Exception $e) {
             DB::rollback();
             Log::error('Order creation failed: ' . $e->getMessage());
-            throw $e;
+            return 'Failed to create the order.';
         }
     }
 }

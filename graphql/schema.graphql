@@ -104,6 +104,8 @@ type Mutation {
         @field(resolver: "App\\GraphQL\\Mutations\\UploadImagesMutation")
     createOrder(input: CreateOrderInput!): Order
         @field(resolver: "App\\GraphQL\\Mutations\\CreateOrderResolver")
+    createStripeCharge(source: String!, order_id: ID!): PaymentResult
+        @field(resolver: "App\\GraphQL\\Mutations\\CreateStripeCharge")
 }
 type Image {
     url: String!
@@ -143,7 +145,7 @@ input CreateReviewInput {
 }
 type Order {
     id: ID!
-    user: User
+    user: User @belongsTo
     status: String
     total_price: Float
     items: [OrderItem] @hasMany
@@ -165,4 +167,9 @@ input CreateOrderInput {
 input CreateOrderItemInput {
     productId: ID!
     quantity: Int!
+}
+
+type PaymentResult {
+    success: Boolean
+    message: String
 }

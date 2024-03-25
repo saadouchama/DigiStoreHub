@@ -6,30 +6,57 @@ namespace App\GraphQL\Mutations;
 
 use App\Models\Order;
 use App\Models\OrderItem;
+use App\Models\Product;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use Illuminate\Support\Facades\DB;
 
 class CreateOrderResolver
 {
     public function __invoke($rootValue, array $args, GraphQLContext $context)
     {
-        // Create order
-        $order = new Order();
-        $order->user_id = $args['input']['userId'];
-        $order->status = 'pending'; // default status
-        $order->save();
-        $total_price = 0;
-        // Add items to the order
-        foreach ($args['input']['items'] as $itemInput) {
-            $item = new OrderItem();
-            $item->order_id = $order->id;
-            $item->product_id = $itemInput['productId'];
-            $item->quantity = $itemInput['quantity'];
-            // Optionally calculate price
-            $total_price += $item->quantity * $item->product->price;
-            $order->update(['total_price' => $total_price]);
-            $item->save();
-        }
+        // Start a transaction
+        DB::beginTransaction();
 
-        return $order;
+        try {
+            // Create order
+            $order = new Order();
+            $order->user_id = $args['input']['userId'];
+            $order->status = 'pending';
+            $order->save();
+
+            $total_price = 0;
+            $itemsData = [];
+
+            // Fetch product prices in one query
+            $productIds = array_column($args['input']['items'], 'productId');
+            $products = Product::whereIn('id', $productIds)->get()->keyBy('id');
+
+            // Prepare items data
+            foreach ($args['input']['items'] as $itemInput) {
+                $product = $products[$itemInput['productId']];
+                $total_price += $itemInput['quantity'] * $product->price;
+
+                $itemsData[] = [
+                    'order_id' => $order->id,
+                    'product_id' => $itemInput['productId'],
+                    'quantity' => $itemInput['quantity'],
+                    'created_at' => now(),
+                    'updated_at' => now()
+                ];
+            }
+
+            // Bulk insert order items
+            OrderItem::insert($itemsData);
+
+            // Update the order with total price
+            $order->total_price = $total_price;
+            $order->save();
+
+            DB::commit();
+            return $order;
+        } catch (\Exception $e) {
+            DB::rollback();
+            throw $e;
+        }
     }
 }

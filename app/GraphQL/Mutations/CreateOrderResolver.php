@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\GraphQL\Mutations;
 
 use App\Models\Order;
-use App\Models\OrderItem;
 use App\Models\Product;
-use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
+use App\Models\OrderItem;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class CreateOrderResolver
 {
@@ -56,6 +57,7 @@ class CreateOrderResolver
             return $order;
         } catch (\Exception $e) {
             DB::rollback();
+            Log::error('Order creation failed: ' . $e->getMessage());
             throw $e;
         }
     }

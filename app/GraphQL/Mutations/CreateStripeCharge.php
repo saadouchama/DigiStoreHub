@@ -19,7 +19,7 @@ class CreateStripeCharge
 
         // Validate input
         $validator = Validator::make($args, [
-            'order_id' => 'required|exists:orders,id',
+            'order_id' => 'required|exists:orders,_id',
             'source' => 'required',
         ]);
 

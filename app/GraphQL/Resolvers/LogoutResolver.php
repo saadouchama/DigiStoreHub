@@ -3,6 +3,7 @@
 namespace App\GraphQL\Resolvers;
 
 use Illuminate\Support\Facades\Auth;
+use Laravel\Sanctum\HasApiTokens;
 use Nuwave\Lighthouse\Support\Contracts\GraphQLContext;
 
 class LogoutResolver
@@ -17,13 +18,16 @@ class LogoutResolver
      */
     public function __invoke($_, array $args, GraphQLContext $context)
     {
+        // Get the authenticated user
         $user = Auth::guard('sanctum')->user();
 
-        if ($user) {
-            $user->tokens()->where('id', $user->currentAccessToken()->id)->delete();
-            return true;
+        if (!$user) {
+            return 'Not authenticated';
         }
 
-        return false;
+        // Revoke the user's current token
+        $user->currentAccessToken()->delete();
+
+        return true;
     }
 }

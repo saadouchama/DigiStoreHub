@@ -8,7 +8,7 @@ class Order extends Eloquent
 {
     protected $connection = 'mongodb';
     protected $collection = 'orders';
-    protected $fillable = ['user_id', 'total_price', 'status'];
+    protected $fillable = ['user_id', 'total_price', 'status', 'created_at', 'updated_at'];
 
     // Define relationship to OrderItem
     public function items()

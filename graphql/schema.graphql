@@ -38,7 +38,7 @@ type Query {
         name: String @where(operator: "like")
     ): [User!]! @paginate(defaultCount: 10)
 
-    me: User @auth(guards: ["sanctum"])
+    me: User @field(resolver: "App\\GraphQL\\Resolvers\\MeResolver")
 
     products: [Product!]!
         @field(resolver: "App\\GraphQL\\Resolvers\\ProductsResolver")
@@ -58,29 +58,52 @@ type User {
     """
     Non-unique name.
     """
-    name: String!
+    name: String
 
     """
     Unique email address.
     """
-    email: String!
+    email: String
 
     """
     When the email was verified.
     """
     email_verified_at: DateTime
 
-    orders: [Order!]!
+    """
+    The user's orders.
+    """
+    orders: [Order] @hasMany
+
+    """
+    The user stripe ID.
+    """
+    stripe_id: String
+
+    """
+    The user card brand.
+    """
+    card_brand: String
+
+    """
+    The user card last four digits.
+    """
+    card_last_four: String
+
+    """
+    The user trial ends at.
+    """
+    trial_ends_at: DateTime
 
     """
     When the account was created.
     """
-    created_at: DateTime!
+    created_at: DateTime
 
     """
     When the account was last updated.
     """
-    updated_at: DateTime!
+    updated_at: DateTime
 }
 
 """
@@ -95,7 +118,7 @@ type Product {
     tags: [String!]!
     images: [String!]!
     ratings: ProductRating # Represents the ratings of a product.
-    reviews: [Review!] # Represents the reviews of a product.
+    reviews: [Review] # Represents the reviews of a product.
 }
 
 """
@@ -159,14 +182,14 @@ type Mutation {
     """
     Mutation to register a new user.
     """
-    register(input: RegisterInput!): User
+    register(input: RegisterInput!): AuthPayload
         @field(resolver: "App\\GraphQL\\Resolvers\\RegisterResolver")
 
     """
     Mutation to login a user.
     """
     login(input: LoginInput!): AuthPayload
-        @field(resolver: "App\\GraphQL\\Resolvers\\LoginResolver")
+        @field(resolver: "App\\GraphQL\\Mutations\\LoginMutation")
 
     """
     Mutation to logout the currently authenticated user.
@@ -176,7 +199,8 @@ type Mutation {
     """
     Mutation to create a new product.
     """
-    createProduct(input: CreateProductInput!): Product! @create
+    createProduct(input: CreateProductInput!): Product!
+        @field(resolver: "App\\GraphQL\\Resolvers\\CreateProductResolver")
 
     """
     Mutation to upload images.
@@ -226,8 +250,8 @@ Input type for user registration.
 input RegisterInput {
     name: String!
     email: String!
-    password: String! @hash
-    password_confirmation: String! @hash
+    password: String!
+    password_confirmation: String!
 }
 
 """

@@ -23,6 +23,9 @@ class CreateProductResolver
         $product->price = $input['price'] ?? null;
         $product->category = $input['category'] ?? null;
         $product->tags = $input['tags'] ?? null;
+        $product->images = $input['images'] ?? null;
+        $product->created_at = now();
+        $product->updated_at = now();
         $product->save();
 
         if (!$product->wasRecentlyCreated) {

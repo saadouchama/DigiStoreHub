@@ -23,7 +23,7 @@
     </form>
     <script>
         var stripe = Stripe(
-            env('STRIPE_KEY')
+            "pk_test_1WfvHTVO8PzBYVRaWFWnnA3N"
         );
         var elements = stripe.elements();
         var style = {
@@ -78,7 +78,7 @@
                     `,
                         variables: {
                             source: token,
-                            order_id: "6600c9f3bc3332e02c0a8962" // Example amount in cents ($20.00)
+                            order_id: "66087c80c9dc051b88092426" // Example amount in cents ($20.00)
                         }
                     }),
                 })

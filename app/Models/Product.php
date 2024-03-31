@@ -9,7 +9,7 @@ class Product extends Model
 {
     protected $connection = 'mongodb';
     protected $collection = 'products';
-    protected $fillable = ['name', 'description', 'price', 'category', 'tags', 'images', 'file_path', 'reviews', 'created_at', 'updated_at'];
+    protected $fillable = ['name', 'description', 'price', 'category', 'tags', 'images', 'file_path', 'average_rating', 'ratings_count', 'reviews', 'created_at', 'updated_at'];
 
     public function reviews()
     {

@@ -27,4 +27,11 @@ class User extends Eloquent implements Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+    public function hasPurchased(Product $product)
+    {
+        // Implement logic to check if this user has purchased the given product
+        return $this->orders()->whereHas('items', function ($query) use ($product) {
+            $query->where('product_id', $product->id);
+        })->exists();
+    }
 }

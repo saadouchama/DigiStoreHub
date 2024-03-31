@@ -34,4 +34,30 @@ class CreateProductResolver
 
         return $product;
     }
+
+    public function update($rootValue, array $args, GraphQLContext $context)
+    {
+        // Check for product ID and input validity
+        if (!isset($args['id'])) {
+            throw new \Exception("Missing product ID.");
+        }
+
+        if (!isset($args['input']) || !is_array($args['input'])) {
+            throw new \Exception("Invalid input data.");
+        }
+
+        // Find the product
+        $product = Product::find($args['id']);
+        if (!$product) {
+            throw new \Exception("Product not found.");
+        }
+
+        // Update product fields
+        $input = $args['input'];
+        $product->fill($input); // Laravel's fill method for mass assignment
+        $product->updated_at = now();
+        $product->save();
+
+        return $product;
+    }
 }

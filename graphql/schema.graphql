@@ -197,16 +197,46 @@ type Mutation {
     logout: Boolean @field(resolver: "App\\GraphQL\\Resolvers\\LogoutResolver")
 
     """
+    Mutation to update a user.
+    """
+    updateUser(id: ID!, input: UpdateUserInput!): User
+        @field(resolver: "App\\GraphQL\\Resolvers\\UpdateUserResolver")
+
+    """
     Mutation to create a new product.
     """
     createProduct(input: CreateProductInput!): Product!
         @field(resolver: "App\\GraphQL\\Resolvers\\CreateProductResolver")
 
     """
+    Mutation to create a new review.
+    """
+    updateProduct(
+        """
+        Represents the product ID to be updated.
+        """
+        id: ID!
+        input: UpdateProductInput!
+    ): Product
+        @field(
+            resolver: "App\\GraphQL\\Resolvers\\CreateProductResolver@update"
+        )
+    """
     Mutation to upload images.
     """
     uploadImages(files: [Upload!]!): [String!]!
         @field(resolver: "App\\GraphQL\\Mutations\\UploadImagesMutation")
+
+    """
+    Mutation to upload a product file.
+    """
+    uploadProductFile(
+        """
+        Represents the product ID to upload the file.
+        """
+        id: ID!
+        file: Upload!
+    ): Product @field(resolver: "App\\GraphQL\\Mutations\\UploadProductFile")
 
     """
     Mutation to create a new order.
@@ -219,6 +249,18 @@ type Mutation {
     """
     createStripeCharge(source: String!, order_id: ID!): PaymentResult
         @field(resolver: "App\\GraphQL\\Mutations\\CreateStripeCharge")
+}
+
+extend type Query {
+    # Retrieves the download link for a specific product.
+    #
+    # Arguments:
+    #   - id: The ID of the product to download.
+    #
+    # Returns:
+    #   - A string representing the download link for the product.
+    downloadProduct(id: ID!): String
+        @field(resolver: "App\\GraphQL\\Resolvers\\ProductFileResolver")
 }
 
 """
@@ -255,6 +297,14 @@ input RegisterInput {
 }
 
 """
+Input type for updating a user.
+"""
+input UpdateUserInput {
+    name: String
+    email: String
+}
+
+"""
 Input type for creating a product.
 """
 input CreateProductInput {
@@ -264,6 +314,17 @@ input CreateProductInput {
     category: String!
     tags: [String!]!
     images: [String!]!
+}
+"""
+Input type for update a product.
+"""
+input UpdateProductInput {
+    name: String
+    description: String
+    price: Float
+    category: String
+    tags: [String]
+    images: [String]
 }
 
 """

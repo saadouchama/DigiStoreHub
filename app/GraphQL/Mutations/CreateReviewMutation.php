@@ -3,17 +3,25 @@
 namespace App\GraphQL\Mutations;
 
 use App\Models\Review;
+use App\Models\Product;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 
 class CreateReviewMutation
 {
+    protected $product;
+
     public function __invoke($rootValue, array $args)
     {
+
+        $user = Auth::guard('sanctum')->user();
+        if (!$user) {
+            throw new \Exception('Not authenticated');
+        }
         $validator = Validator::make($args['input'], [
-            'productId' => 'required|exists:products,id',
-            'userId' => 'required|exists:users,id',
-            'text' => 'required|string',
+            'productId' => 'required|exists:products,_id',
+            'comment' => 'required|string',
             'rating' => 'required|numeric|min:1|max:5',
         ]);
 
@@ -25,15 +33,27 @@ class CreateReviewMutation
 
             $review = Review::create([
                 'product_id' => $args['input']['productId'],
-                'user_id' => $args['input']['userId'],
-                'text' => $args['input']['text'],
+                'user_id' => $user->id,
+                'comment' => $args['input']['comment'],
                 'rating' => $args['input']['rating'],
+                'date' => now(),
+                'update_at' => now()
             ]);
+
+            $product = Product::find($review->product_id);
+            $product->averageRating = $product->averageRating();
+            $this->product = $product;
 
             return $review;
         } catch (\Exception $e) {
             Log::error('Review creation failed: ' . $e->getMessage());
             return 'Failed to create the review.';
         }
+    }
+    public function avgRatings($rootValue, array $args) {
+        return [
+            'average' => $this->product->averageRating,
+            'count' => count($this->product->reviews)
+        ];
     }
 }

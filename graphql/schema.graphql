@@ -117,7 +117,7 @@ type Product {
     category: String!
     tags: [String!]!
     images: [String!]!
-    ratings: ProductRating # Represents the ratings of a product.
+    ratings: ProductRating @field(resolver: "App\\GraphQL\\Mutations\\CreateReviewMutation@avgRatings")# Represents the ratings of a product.
     reviews: [Review] # Represents the reviews of a product.
 }
 
@@ -142,11 +142,12 @@ Represents a review of a product.
 """
 type Review {
     id: ID!
-    productId: ID!
-    userId: ID!
-    text: String!
+    product: ID! @belongsTo
+    user: ID! @belongsTo
+    comment: String!
     rating: Float!
-    date: String!
+    date: DateTime!
+    updated_at: DateTime!
 }
 
 """
@@ -249,6 +250,10 @@ type Mutation {
     """
     createStripeCharge(source: String!, order_id: ID!): PaymentResult
         @field(resolver: "App\\GraphQL\\Mutations\\CreateStripeCharge")
+
+    createReview(input: CreateReviewInput!): Review
+        @field(resolver: "App\\GraphQL\\Mutations\\CreateReviewMutation")
+
 }
 
 extend type Query {
@@ -332,8 +337,7 @@ Input type for creating a review.
 """
 input CreateReviewInput {
     productId: ID! # Represents the product ID.
-    userId: ID! # Represents the user ID.
-    text: String!
+    comment: String!
     rating: Float!
 }
 

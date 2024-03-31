@@ -27,6 +27,10 @@ class User extends Eloquent implements Authenticatable
     {
         return $this->hasMany(Order::class);
     }
+    public function reviews()
+    {
+        return $this->hasMany(Review::class);
+    }
     public function hasPurchased(Product $product)
     {
         // Implement logic to check if this user has purchased the given product

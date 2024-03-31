@@ -117,8 +117,9 @@ type Product {
     category: String!
     tags: [String!]!
     images: [String!]!
-    ratings: ProductRating @field(resolver: "App\\GraphQL\\Mutations\\CreateReviewMutation@avgRatings")# Represents the ratings of a product.
-    reviews: [Review] # Represents the reviews of a product.
+    average_rating: Float
+    ratings_count: Int
+    reviews: [Review] @hasMany # Represents the reviews of a product.
 }
 
 """
@@ -130,14 +131,6 @@ input UploadImageInput {
 }
 
 """
-Represents the rating of a product.
-"""
-type ProductRating {
-    average: Float!
-    count: Int!
-}
-
-"""
 Represents a review of a product.
 """
 type Review {
@@ -146,7 +139,7 @@ type Review {
     user: ID! @belongsTo
     comment: String!
     rating: Float!
-    date: DateTime!
+    created_at: DateTime!
     updated_at: DateTime!
 }
 
@@ -253,7 +246,6 @@ type Mutation {
 
     createReview(input: CreateReviewInput!): Review
         @field(resolver: "App\\GraphQL\\Mutations\\CreateReviewMutation")
-
 }
 
 extend type Query {

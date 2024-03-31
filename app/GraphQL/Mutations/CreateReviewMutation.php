@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Log;
 
 class CreateReviewMutation
 {
-    protected $product;
 
     public function __invoke($rootValue, array $args)
     {
@@ -36,24 +35,20 @@ class CreateReviewMutation
                 'user_id' => $user->id,
                 'comment' => $args['input']['comment'],
                 'rating' => $args['input']['rating'],
-                'date' => now(),
-                'update_at' => now()
+                'created_at' => now(),
+                'updated_at' => now()
             ]);
 
             $product = Product::find($review->product_id);
-            $product->averageRating = $product->averageRating();
-            $this->product = $product;
+            $product->update([
+                'average_rating' => $product->averageRating(),
+                'ratings_count' => count($product->reviews)
+            ]);
 
             return $review;
         } catch (\Exception $e) {
             Log::error('Review creation failed: ' . $e->getMessage());
             return 'Failed to create the review.';
         }
-    }
-    public function avgRatings($rootValue, array $args) {
-        return [
-            'average' => $this->product->averageRating,
-            'count' => count($this->product->reviews)
-        ];
     }
 }

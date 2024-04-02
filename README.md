@@ -23,8 +23,8 @@ In the digital world's fast pace, the demand for instant access to digital produ
 > **Step #1** - Clone the project
 
 ```bash
-$ git clone https://github.com/your-repository/digistorehub.git
-$ cd digistorehub
+$ git clone https://github.com/saadouchama/DigiStoreHub.git
+$ cd DigiStoreHub
 ```
 
 <br />
